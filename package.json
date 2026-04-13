@@ -1,0 +1,28 @@
+{
+  "name": "pillar-bot",
+  "version": "0.1.0",
+  "description": "Self-hosted Telegram bot for daily pillars support",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@hono/node-server": "^1.14.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "dotenv": "^17.4.2",
+    "grammy": "^1.35.0",
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
