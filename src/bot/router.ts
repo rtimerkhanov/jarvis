@@ -48,7 +48,7 @@ export async function classifyText(
 
     const validTypes: ActionType[] = [
       'food_text', 'journal_therapy', 'journal_free',
-      'supplement', 'recipe_query',
+      'time_entry', 'supplement', 'recipe_query',
     ];
 
     if (validTypes.includes(parsed.type)) return parsed.type;

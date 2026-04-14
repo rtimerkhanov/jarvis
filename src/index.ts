@@ -5,6 +5,8 @@ import { webhookCallback } from 'grammy';
 import { createBot } from './bot/telegram.js';
 import { env } from './config/env.js';
 import { supabase } from './services/supabase.js';
+import { getAuthUrl, handleCallback } from './services/google.js';
+import { startScheduler } from './cron/scheduler.js';
 
 const app = new Hono();
 const bot = createBot();
@@ -35,6 +37,36 @@ app.get('/api/logs', async (c) => {
   return c.json({ data: data ?? [], error: error?.message });
 });
 
+// --- Google OAuth ---
+app.get('/auth/google/personal', (c) => {
+  try {
+    return c.redirect(getAuthUrl('personal'));
+  } catch {
+    return c.text('Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.', 500);
+  }
+});
+
+app.get('/auth/google/work', (c) => {
+  try {
+    return c.redirect(getAuthUrl('work'));
+  } catch {
+    return c.text('Google OAuth not configured.', 500);
+  }
+});
+
+app.get('/auth/google/callback', async (c) => {
+  const code = c.req.query('code');
+  const state = c.req.query('state') ?? 'personal';
+  if (!code) return c.text('Missing code', 400);
+
+  try {
+    await handleCallback(code, state);
+    return c.html(`<h2>Google ${state} account connected!</h2><p>You can close this tab.</p>`);
+  } catch (err) {
+    return c.text(`OAuth error: ${err}`, 500);
+  }
+});
+
 // --- Log feed frontend ---
 app.get('/logs', (c) => {
   return c.html(LOG_VIEWER_HTML);
@@ -42,10 +74,19 @@ app.get('/logs', (c) => {
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+// Start cron scheduler
+const chatId = env.ALLOWED_CHAT_IDS[0];
+const sendMessage = async (cid: number, text: string, options?: unknown) => {
+  await bot.api.sendMessage(cid, text, options as Parameters<typeof bot.api.sendMessage>[2]);
+};
+startScheduler(sendMessage, chatId);
+
 if (isDev) {
   console.log('Starting pillar-bot in polling mode...');
   serve({ fetch: app.fetch, port: env.PORT }, () => {
     console.log(`Log viewer: http://localhost:${env.PORT}/logs`);
+    console.log(`OAuth personal: http://localhost:${env.PORT}/auth/google/personal`);
+    console.log(`OAuth work: http://localhost:${env.PORT}/auth/google/work`);
   });
   bot.start({
     onStart: () => console.log('pillar-bot polling started'),

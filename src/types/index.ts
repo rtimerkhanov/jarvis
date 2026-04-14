@@ -7,6 +7,7 @@ export type ActionType =
   | 'journal_therapy'
   | 'supplement'
   | 'recipe_query'
+  | 'time_entry'
   | 'pending_answer'
   | 'ask_clarification';
 

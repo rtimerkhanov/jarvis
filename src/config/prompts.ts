@@ -89,10 +89,11 @@ export const PROMPTS = {
 - "food_text" — описание еды, что съел/выпил/приготовил, с указанием продуктов или блюд
 - "journal_therapy" — заметки с психолога, терапии, сессии
 - "journal_free" — мысли, рефлексия, дневник, настроение, события дня, переживания, наблюдения
+- "time_entry" — ввод активности с временным интервалом: "с 15 до 17 работал", "9-10 встреча", "гулял час"
 - "supplement" — приём добавок, витаминов, таблеток
 - "recipe_query" — вопрос про рецепт, что приготовить
 - "unknown" — не удалось понять (команда, случайное сообщение, вопрос к боту)
 
 Верни ТОЛЬКО JSON:
-{"type": "food_text" | "journal_therapy" | "journal_free" | "supplement" | "recipe_query" | "unknown"}`,
+{"type": "food_text" | "journal_therapy" | "journal_free" | "time_entry" | "supplement" | "recipe_query" | "unknown"}`,
 } as const;

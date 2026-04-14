@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Jarvis History Tracker",
+  "version": "1.0.0",
+  "description": "Sends browser history to Supabase for time tracking",
+  "permissions": ["history", "tabs", "alarms", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -4,6 +4,7 @@ import { classifyPhoto, classifyText, getPhotoBase64 } from './router.js';
 import { handleFoodPhoto, handleFoodText, handleMealTypeCallback } from '../handlers/food.js';
 import { handleNotebook } from '../handlers/notebook.js';
 import { handleJournal, handleJournalList } from '../handlers/journal.js';
+import { handleTimeEntry, handleGapCallback, handleDayTimeline } from '../handlers/time.js';
 import { setPendingQuestion } from '../utils/context.js';
 import { logger } from '../services/logger.js';
 
@@ -35,6 +36,18 @@ export function createBot(): Bot {
     await logger.handled(ctx.chat.id, 'start', {}, startMs);
   });
 
+  // /day command
+  bot.command('day', async (ctx) => {
+    const startMs = await logger.incoming(ctx.chat.id, '/day');
+    try {
+      await handleDayTimeline(ctx);
+      await logger.handled(ctx.chat.id, 'day_timeline', {}, startMs);
+    } catch (err) {
+      await logger.handlerError(ctx.chat.id, 'day_timeline', err, startMs);
+      await ctx.reply('Ошибка при загрузке таймлайна.');
+    }
+  });
+
   // /journal command
   bot.command('journal', async (ctx) => {
     const startMs = await logger.incoming(ctx.chat.id, '/journal');
@@ -57,6 +70,12 @@ export function createBot(): Bot {
       if (data.startsWith('meal:')) {
         await handleMealTypeCallback(ctx);
         await logger.handled(chatId, 'meal_type_callback', { meal: data }, startMs);
+        return;
+      }
+
+      if (data.startsWith('gap:')) {
+        await handleGapCallback(ctx);
+        await logger.handled(chatId, 'gap_callback', { data }, startMs);
         return;
       }
 
@@ -147,6 +166,9 @@ export function createBot(): Bot {
           break;
         case 'journal_free':
           await handleJournal(ctx, 'free');
+          break;
+        case 'time_entry':
+          await handleTimeEntry(ctx);
           break;
         case 'pending_answer':
           await setPendingQuestion(chatId, null);
